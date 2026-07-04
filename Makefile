@@ -23,7 +23,7 @@ clean:
 
 install:
 	install -Dm755 $(TARGET) $(DESTDIR)/usr/local/bin/gitool
-	install -Dm644 gitool.1 $(DESTDIR)/usr/local/share/man/man1/gitool.1
+	install -Dm644 doc/gitool.1 $(DESTDIR)/usr/local/share/man/man1/gitool.1
 	mandb
 
 uninstall:
