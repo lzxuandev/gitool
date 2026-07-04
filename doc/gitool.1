@@ -1,0 +1,47 @@
+.TH GITOOL 1 "2026-07-05" "0.01" "gitool Manual"
+.SH NAME
+gitool \- A lightweight CLI tool to manage remote git repositories via API.
+.SH SYNOPSIS
+.B gitool
+[\fIoptions\fR] \fIcommand\fR [\fIarguments\fR]
+.SH DESCRIPTION
+.B gitool
+is a command-line utility designed to upload, delete, list, and download files from remote git repositories directly using Personal Access Tokens.
+.SH OPTIONS
+.TP
+.BR \-V ", " \-\-verbose
+Enable verbose (debug) output mode. .TP
+.BR \-q ", " \-\-quiet
+Suppress status messages.
+.TP
+.BI \-t ", " \-\-token =\fI<token>\fR
+Set remote repository Personal Access Token API (default: null).
+.TP
+.BI \-b ", " \-\-branch =\fI<branch>\fR
+Set remote repository Branch (default: main).
+.TP
+.BR \-v ", " \-\-version
+Show version.
+.TP
+.BR \-h ", " \-\-help
+Show help.
+.SH COMMANDS
+.TP
+.B upload \fI<local_path> <username@repo:path>\fR
+Upload local file to remote path.
+.TP
+.B delete \fI<username@repo:path>\fR
+Delete file from remote repository.
+.TP
+.B list \fI<username@repo:path>\fR
+List files in remote repository.
+.TP
+.B download \fI<username@repo:path>\fR
+Download remote file to current directory.
+.SH EXAMPLES
+.EX
+$ gitool download tom@project:example.txt
+$ gitool list james@project:example.txt -q
+$ gitool delete michael@project:old_file.txt --verbose
+$ gitool upload /home/rick/Documents/example.pdf rick@project:secret.pdf -t ghp_TOM_TOKEN
+.EE

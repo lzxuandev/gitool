@@ -1,0 +1,102 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }} (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: x86_64
+            runner: ubuntu-latest
+            artifact_name: gitool-linux-x86_64.tar.gz
+          - os: windows
+            arch: amd64
+            runner: windows-latest
+            artifact_name: gitool-windows-amd64.zip
+          - os: macos
+            arch: arm64
+            runner: macos-latest
+            artifact_name: gitool-macos-arm64.tar.gz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies (Linux)
+        if: matrix.os == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libcjson-dev libssl-dev
+
+      - name: Install Dependencies (macOS)
+        if: matrix.os == 'macos'
+        run: |
+          brew install curl cjson openssl
+
+      - name: Install Dependencies (Windows)
+        if: matrix.os == 'windows'
+        run: |
+          vcpkg install curl cjson openssl --triplet x64-windows
+
+      - name: Build Project (Linux/macOS)
+        if: matrix.os != 'windows'
+        run: |
+          make
+          ./build/gitool -v
+
+      - name: Build Project (Windows)
+        if: matrix.os == 'windows'
+        shell: bash
+        run: |
+          VCPKG_ROOT="/c/vcpkg/installed/x64-windows"
+          mkdir -p build
+          gcc src/*.c src/command/*.c -o build/gitool.exe \
+            -I include -I "$VCPKG_ROOT/include" \
+            -L "$VCPKG_ROOT/lib" \
+            -lcurl -lcjson -lcrypto -lssl -lws2_32 -lcrypt32
+
+      - name: Package Asset (Linux/macOS)
+        if: matrix.os != 'windows'
+        run: |
+          tar -czvf ${{ matrix.artifact_name }} -C build gitool README.md gitool.1
+
+      - name: Package Asset (Windows)
+        if: matrix.os == 'windows'
+        shell: bash
+        run: |
+          cp README.md build/
+          cd build
+          7z a ../${{ matrix.artifact_name }} gitool.exe README.md
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-${{ matrix.arch }}-artifact
+          path: ${{ matrix.artifact_name }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

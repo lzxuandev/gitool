@@ -1,0 +1,23 @@
+TabWidth: 4
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 0
+PointerAlignment: Right
+AlignConsecutiveAssignments: Consecutive
+AlignOperands: true
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+MaxEmptyLinesToKeep: 2
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: Always
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+
+BasedOnStyle: LLVM
+BreakBeforeBraces: Allman
+SpaceBeforeParens: ControlStatements
